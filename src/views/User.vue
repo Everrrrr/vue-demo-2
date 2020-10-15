@@ -19,6 +19,7 @@
       <!-- <meta name="referrer" content="no-referrer" /> -->
     </div>
     <van-cell-group>
+      <van-cell title="首页" is-link @click="$router.push('/home')" />
       <van-cell
         title="我的关注"
         is-link
@@ -32,7 +33,7 @@
         @click="$router.push('/mycomments')"
       />
       <van-cell
-        title="我是收藏"
+        title="我的收藏"
         is-link
         value="文档/视频"
         @click="$router.push('/mystar')"
