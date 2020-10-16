@@ -12,11 +12,105 @@
         <i class="iconfont iconwode"></i>
       </div>
     </div>
+    <!-- tab栏 -->
+     <van-tabs v-model="active">
+      <van-tab :title="tabs.name" v-for="tabs in tabsList" :key="tabs.id">
+        <van-pull-refresh v-model="isRefreshing" @refresh="onRefresh">
+          <van-list
+          offset="50"
+          v-model="loading"
+          :finished="finished"
+          @load="onLoad"
+          finished-text="没有更多内容了"
+          :immediate-check="false"
+        >
+        <hm-post v-for='(post, index) in postList' :key='index' :post='post'/>
+          </van-list>
+        </van-pull-refresh>
+      </van-tab>
+    </van-tabs>
+
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      tabsList:[],
+      postList: [],
+      active: 1,
+      // 当前页
+      pageIndex: 1,
+      // 每页的条数
+      pageSize: 5,
+      loading: false, // 是否正在加载 控制加载的状态
+      finished: false,
+      isRefreshing : false
+    }
+  },
+  watch: {
+    active(value) {
+      this.postList = []
+      this.pageIndex = 1
+      this.finished = false
+      this.loading = true 
+      this.getPostList(this.tabsList[value].id)
+    }
+
+  },
+  created() {
+    this.getTabsList()
+
+  },
+  methods:{
+
+    async getTabsList() {
+      let res = await this.$axios.get('/category')
+      this.tabsList = res.data.data
+       // 请求文章列表
+      this.getPostList(this.tabsList[this.active].id)
+  
+    },
+    async getPostList(id) {
+      let res = await this.$axios.get('/post', {
+        params: {
+          category: id,
+          pageIndex: this.pageIndex,
+          pageSize: this.pageSize
+        },
+
+      })
+      //  if (this.postList.length > 0 && this.pageIndex === 1) {
+      //      this.postList = []
+      // }
+      this.postList = [...this.postList,...res.data.data ]
+      this.loading = false
+      if (res.data.data.length < 5) {
+        this.finished = true
+      }
+      this.isRefreshing = false
+      console.log('文章列表', this.postList)
+    },
+    onLoad () {
+      console.log('触底了');
+      this.pageIndex++
+      this.getPostList(this.tabsList[this.active].id)
+    },
+    onRefresh () {
+      setTimeout(()=> {
+
+        this.postList = []
+        this.pageIndex = 1
+         // 处理文字
+        this.finished = false
+        this.loading = true
+        this.getPostList(this.tabsList[this.active].id)
+      },1000)
+
+    }
+  }
+}
 </script>
 
 <style scoped lang="less">
