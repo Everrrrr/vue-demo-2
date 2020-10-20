@@ -13,23 +13,33 @@
       </div>
     </div>
     <!-- tab栏 -->
-     <van-tabs v-model="active">
+    <van-sticky :offset-top="0" z-index="999">
+      <div class="container" @click="sticky">
+        <i class="iconfont iconjiantou1"></i>
+      </div>
+    </van-sticky>
+
+    <van-tabs v-model="active" sticky>
       <van-tab :title="tabs.name" v-for="tabs in tabsList" :key="tabs.id">
         <van-pull-refresh v-model="isRefreshing" @refresh="onRefresh">
           <van-list
-          offset="50"
-          v-model="loading"
-          :finished="finished"
-          @load="onLoad"
-          finished-text="没有更多内容了"
-          :immediate-check="false"
-        >
-        <hm-post v-for='(post, index) in postList' :key='index' :post='post'/>
+            offset="50"
+            v-model="loading"
+            :finished="finished"
+            @load="onLoad"
+            finished-text="没有更多内容了"
+            :immediate-check="false"
+          >
+            <hm-post
+              @click.native="$router.push(`/detail/${post.id}`)"
+              v-for="(post, index) in postList"
+              :key="index"
+              :post="post"
+            />
           </van-list>
         </van-pull-refresh>
       </van-tab>
     </van-tabs>
-
   </div>
 </template>
 
@@ -37,7 +47,7 @@
 export default {
   data() {
     return {
-      tabsList:[],
+      tabsList: [],
       postList: [],
       active: 1,
       // 当前页
@@ -46,7 +56,7 @@ export default {
       pageSize: 5,
       loading: false, // 是否正在加载 控制加载的状态
       finished: false,
-      isRefreshing : false
+      isRefreshing: false,
     }
   },
   watch: {
@@ -54,37 +64,35 @@ export default {
       this.postList = []
       this.pageIndex = 1
       this.finished = false
-      this.loading = true 
+      this.loading = true
       this.getPostList(this.tabsList[value].id)
-    }
-
+    },
   },
   created() {
     this.getTabsList()
-
   },
-  methods:{
-
+  methods: {
+    sticky() {
+      console.log(666)
+    },
     async getTabsList() {
       let res = await this.$axios.get('/category')
       this.tabsList = res.data.data
-       // 请求文章列表
+      // 请求文章列表
       this.getPostList(this.tabsList[this.active].id)
-  
     },
     async getPostList(id) {
       let res = await this.$axios.get('/post', {
         params: {
           category: id,
           pageIndex: this.pageIndex,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
         },
-
       })
       //  if (this.postList.length > 0 && this.pageIndex === 1) {
       //      this.postList = []
       // }
-      this.postList = [...this.postList,...res.data.data ]
+      this.postList = [...this.postList, ...res.data.data]
       this.loading = false
       if (res.data.data.length < 5) {
         this.finished = true
@@ -92,24 +100,22 @@ export default {
       this.isRefreshing = false
       console.log('文章列表', this.postList)
     },
-    onLoad () {
-      console.log('触底了');
+    onLoad() {
+      console.log('触底了')
       this.pageIndex++
       this.getPostList(this.tabsList[this.active].id)
     },
-    onRefresh () {
-      setTimeout(()=> {
-
+    onRefresh() {
+      setTimeout(() => {
         this.postList = []
         this.pageIndex = 1
-         // 处理文字
+        // 处理文字
         this.finished = false
         this.loading = true
         this.getPostList(this.tabsList[this.active].id)
-      },1000)
-
-    }
-  }
+      }, 1000)
+    },
+  },
 }
 </script>
 
@@ -148,5 +154,21 @@ export default {
   .right {
     width: 60px;
   }
+}
+.container {
+  width: 40px;
+  height: 43.98px;
+  line-height: 43.98px;
+  text-align: center;
+
+  background: #ddd;
+  position: absolute;
+  right: 0;
+  z-index: 999; // 添加 z-index 点击方可
+}
+
+/deep/ .van-tabs__nav {
+  background: #ddd;
+  margin-right: 40px;
 }
 </style>

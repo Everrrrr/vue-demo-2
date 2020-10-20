@@ -7,6 +7,8 @@ import HmHeader from './components/HmHeader.vue'
 import HmLogo from './components/HmLogo.vue'
 import HmButton from './components/HmButton.vue'
 import HmPost from './components/HmPost.vue'
+import HmComment from './components/HmComment.vue'
+import HmFloor from './components/HmFloor.vue'
 
 import './styles/base.less'
 import './styles/iconfont.css'
@@ -22,7 +24,8 @@ import {
   List,
   Tab,
   Tabs,
-  PullRefresh
+  PullRefresh,
+  Sticky,
 } from 'vant'
 // 注册一个全局过滤器
 import moment from 'moment'
@@ -42,11 +45,14 @@ Vue.use(List)
 Vue.use(Tab)
 Vue.use(Tabs)
 Vue.use(PullRefresh)
+Vue.use(Sticky)
 Vue.config.productionTip = false
 Vue.component('hm-header', HmHeader)
 Vue.component('hm-logo', HmLogo)
 Vue.component('hm-button', HmButton)
 Vue.component('hm-post', HmPost)
+Vue.component('hm-floor', HmFloor)
+Vue.component('hm-comment', HmComment)
 
 // axios处理
 import axios from 'axios'

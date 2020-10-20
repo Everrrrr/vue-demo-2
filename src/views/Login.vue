@@ -89,7 +89,11 @@ export default {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user_id', data.user.id)
           this.$toast.success(message)
-          this.$router.push('/user')
+          if (this.$route.params.back) {
+            this.$router.back()
+          } else {
+            this.$router.push('/user')
+          }
         } else {
           this.$toast.fail(message)
         }
@@ -109,7 +113,7 @@ export default {
             username: this.username,
             password: this.password,
           })
-          .then((res) => {
+          .then(res => {
             console.log(res)
             const { statusCode, message, data } = res.data
             if (statusCode === 200) {

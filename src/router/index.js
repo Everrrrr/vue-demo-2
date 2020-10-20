@@ -8,6 +8,7 @@ import MyFollow from '../views/MyFollow.vue'
 import MyComments from '../views/MyComments.vue'
 import MyStar from '../views/MyStar.vue'
 import Home from '../views/Home.vue'
+import Detail from '../views/Detail.vue'
 
 Vue.use(VueRouter)
 
@@ -51,6 +52,11 @@ const routes = [
   {
     path: '/home',
     component: Home,
+  },
+  {
+    path: '/detail/:id',
+    name: 'detail',
+    component: Detail,
   },
 ]
 
