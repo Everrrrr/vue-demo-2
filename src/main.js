@@ -80,6 +80,9 @@ axios.interceptors.response.use(res => {
   return res
 })
 
+const bus = new Vue()
+Vue.prototype.$bus = bus
+
 new Vue({
   router,
   render: h => h(App),

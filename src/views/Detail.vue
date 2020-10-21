@@ -40,6 +40,7 @@
       </div>
     </div>
     <!-- 评论 -->
+    <div ref="box"></div>
     <div class="comments">
       <hm-comment
         v-for="item in commentList"
@@ -52,18 +53,23 @@
       <div class="input" v-if="!isShow">
         <input type="text" @focus="handleFocus" placeholder="写跟帖" />
         <i class="iconfont iconpinglun-">
-          <i class="counter">1</i>
+          <i class="counter">{{ detail.comment_length }}</i>
         </i>
-        <i class="iconfont iconshoucang"></i>
+        <i
+          class="iconfont iconshoucang"
+          @click="star"
+          :class="{ active: detail.has_star }"
+        ></i>
         <i class="iconfont iconfenxiang"></i>
       </div>
       <div class="textarea" v-else>
         <textarea
+          v-model="content"
           @blur="handleBlur"
-          placeholder="马哥"
+          :placeholder="replyName ? '回复 :' + replyName : '请输入内容'"
           ref="textarea"
         ></textarea>
-        <div class="send">发送</div>
+        <div class="send" @mousedown="send">发送</div>
       </div>
     </div>
   </div>
@@ -78,11 +84,24 @@ export default {
       },
       commentList: [],
       isShow: false,
+      replyId: 0,
+      replyName: '',
+      content: '',
     }
   },
-  async created() {
+  created() {
     this.getDetail()
     this.getCommentsList()
+    this.$bus.$on('reply', async (replyId, replyName) => {
+      this.replyId = replyId
+      this.replyName = replyName
+
+      this.isShow = true
+      await this.$nextTick()
+      if (this.$refs.textarea) {
+        this.$refs.textarea.focus()
+      }
+    })
   },
   methods: {
     async getDetail() {
@@ -156,6 +175,34 @@ export default {
       console.log(123)
 
       this.isShow = false
+      if (!this.content) {
+        this.replyId = ''
+        this.replyName = ''
+      }
+    },
+    async send() {
+      let res = await this.$axios.post(
+        `/post_comment/${this.$route.params.id}`,
+        {
+          content: this.content,
+          parent_id: this.replyId,
+        }
+      )
+      const { statusCode, message } = res.data
+      if (statusCode == 200) {
+        this.$toast.success(message)
+        this.getCommentsList()
+        this.content = ''
+        this.replyId = ''
+        this.replyName = ''
+        this.isShow = false
+        this.$refs.box.scrollIntoView()
+      }
+    },
+    async star() {
+      let res = await this.$axios.get(`/post_star/${this.detail.id}`)
+      this.$toast.success(res.data.message)
+      this.getDetail()
     },
   },
 }
@@ -261,6 +308,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+    .active {
+      color: red;
+    }
     input {
       height: 30px;
       width: 180px;

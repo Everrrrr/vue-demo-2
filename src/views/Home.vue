@@ -14,7 +14,7 @@
     </div>
     <!-- tab栏 -->
     <van-sticky :offset-top="0" z-index="999">
-      <div class="container" @click="sticky">
+      <div class="container" @click="$router.push('/tabedit')">
         <i class="iconfont iconjiantou1"></i>
       </div>
     </van-sticky>
@@ -45,6 +45,7 @@
 
 <script>
 export default {
+  name: 'home',
   data() {
     return {
       tabsList: [],
@@ -72,10 +73,13 @@ export default {
     this.getTabsList()
   },
   methods: {
-    sticky() {
-      console.log(666)
-    },
     async getTabsList() {
+      let activeTabs = JSON.parse(localStorage.getItem('activeTabs'))
+      if (activeTabs) {
+        this.tabsList = activeTabs
+        this.getPostList(this.tabsList[this.active].id)
+        return
+      }
       let res = await this.$axios.get('/category')
       this.tabsList = res.data.data
       // 请求文章列表

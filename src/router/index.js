@@ -9,6 +9,7 @@ import MyComments from '../views/MyComments.vue'
 import MyStar from '../views/MyStar.vue'
 import Home from '../views/Home.vue'
 import Detail from '../views/Detail.vue'
+import TabEdit from '../views/TabEdit.vue'
 
 Vue.use(VueRouter)
 
@@ -57,6 +58,11 @@ const routes = [
     path: '/detail/:id',
     name: 'detail',
     component: Detail,
+  },
+  {
+    path: '/tabedit',
+    component: TabEdit,
+    name: 'tabedit',
   },
 ]
 

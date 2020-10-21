@@ -1,7 +1,10 @@
 <template>
   <div>
     <!-- 指定路由出口 -->
-    <router-view></router-view>
+
+    <keep-alive include="home">
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
